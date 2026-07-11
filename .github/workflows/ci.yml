@@ -8,6 +8,10 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   java-services:
     name: Build Java services (${{ matrix.service }})
@@ -37,7 +41,7 @@ jobs:
           --health-retries=10
 
     steps:
-      - name: Descargar código
+      - name: Descargar codigo
         uses: actions/checkout@v5
 
       - name: Configurar Java
@@ -69,7 +73,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Descargar código
+      - name: Descargar codigo
         uses: actions/checkout@v5
 
       - name: Configurar Node.js
@@ -95,8 +99,87 @@ jobs:
       - frontend
 
     steps:
-      - name: Descargar código
+      - name: Descargar codigo
         uses: actions/checkout@v5
 
-      - name: Construir imágenes
+      - name: Construir imagenes
         run: docker compose build
+
+  publish-ecr:
+    name: Publish images to Amazon ECR
+    runs-on: ubuntu-latest
+    needs:
+      - java-services
+      - frontend
+      - docker-build
+
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Descargar codigo
+        uses: actions/checkout@v5
+
+      - name: Configurar credenciales temporales de AWS
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Iniciar sesion en Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Construir y publicar auth-service
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build \
+            -t $ECR_REGISTRY/veterinary-auth-service:$IMAGE_TAG \
+            -t $ECR_REGISTRY/veterinary-auth-service:latest \
+            ./auth-service
+
+          docker push $ECR_REGISTRY/veterinary-auth-service:$IMAGE_TAG
+          docker push $ECR_REGISTRY/veterinary-auth-service:latest
+
+      - name: Construir y publicar owner-service
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build \
+            -f ./owner-service/dockerfile \
+            -t $ECR_REGISTRY/veterinary-owner-service:$IMAGE_TAG \
+            -t $ECR_REGISTRY/veterinary-owner-service:latest \
+            ./owner-service
+
+          docker push $ECR_REGISTRY/veterinary-owner-service:$IMAGE_TAG
+          docker push $ECR_REGISTRY/veterinary-owner-service:latest
+
+      - name: Construir y publicar pet-service
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build \
+            -f ./pet-service/dockerfile \
+            -t $ECR_REGISTRY/veterinary-pet-service:$IMAGE_TAG \
+            -t $ECR_REGISTRY/veterinary-pet-service:latest \
+            ./pet-service
+
+          docker push $ECR_REGISTRY/veterinary-pet-service:$IMAGE_TAG
+          docker push $ECR_REGISTRY/veterinary-pet-service:latest
+
+      - name: Construir y publicar frontend
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build \
+            -f ./veterinary-frontend/dockerfile \
+            -t $ECR_REGISTRY/veterinary-frontend:$IMAGE_TAG \
+            -t $ECR_REGISTRY/veterinary-frontend:latest \
+            ./veterinary-frontend
+
+          docker push $ECR_REGISTRY/veterinary-frontend:$IMAGE_TAG
+          docker push $ECR_REGISTRY/veterinary-frontend:latest
