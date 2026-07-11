@@ -21,6 +21,21 @@ jobs:
           - owner-service
           - pet-service
 
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: veterinary_ci
+          MYSQL_ROOT_HOST: "%"
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -uroot -proot --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
     steps:
       - name: Descargar código
         uses: actions/checkout@v5
@@ -39,6 +54,14 @@ jobs:
 
       - name: Compilar y ejecutar pruebas
         working-directory: ${{ matrix.service }}
+        env:
+          SPRING_DATASOURCE_URL: "jdbc:mysql://127.0.0.1:3306/veterinary_ci?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC"
+          SPRING_DATASOURCE_USERNAME: root
+          SPRING_DATASOURCE_PASSWORD: root
+          JWT_SECRET: "01234567890123456789012345678901"
+          AUTH_USERNAME: admin
+          AUTH_PASSWORD: admin123
+          OWNER_SERVICE_URL: "http://localhost:8082"
         run: ./mvnw clean verify
 
   frontend:
