@@ -23,6 +23,9 @@ services:
 
   auth-service:
     image: veterinary-auth-service:latest
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
     container_name: veterinary-auth-container
     environment:
       AUTH_USERNAME: admin
@@ -35,6 +38,9 @@ services:
 
   owner-service:
     image: veterinary-owner-service:latest
+    build:
+      context: ./owner-service
+      dockerfile: dockerfile
     container_name: veterinary-owner-container
     environment:
       SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/veterinary_owners?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC"
@@ -51,6 +57,9 @@ services:
 
   pet-service:
     image: veterinary-pet-service:latest
+    build:
+      context: ./pet-service
+      dockerfile: dockerfile
     container_name: veterinary-pet-container
     environment:
       SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/veterinary_pets?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC"
@@ -70,6 +79,9 @@ services:
 
   frontend:
     image: veterinary-frontend:latest
+    build:
+      context: ./veterinary-frontend
+      dockerfile: dockerfile
     container_name: veterinary-frontend-container
     ports:
       - "4200:4200"
