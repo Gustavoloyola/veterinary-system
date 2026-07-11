@@ -1,0 +1,155 @@
+<div class="page">
+  <section class="form-card">
+    <div class="header">
+      <span class="eyebrow">Veterinaria</span>
+
+      <h1>
+        @if (editMode()) {
+        Editar mascota
+        } @else {
+        Nueva mascota
+        }
+      </h1>
+
+      <p>
+        Captura la información de la mascota.
+      </p>
+    </div>
+
+    @if (errorMessage()) {
+    <div class="error-message">
+      {{ errorMessage() }}
+    </div>
+    }
+
+    <form [formGroup]="petForm" (ngSubmit)="submit()">
+      <div class="field">
+        <label for="name">Nombre</label>
+
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          placeholder="Nombre de la mascota"
+        >
+
+        @if (
+        petForm.controls.name.touched &&
+        petForm.controls.name.invalid
+        ) {
+        <small>El nombre es obligatorio.</small>
+        }
+      </div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label for="species">Especie</label>
+
+          <input
+            id="species"
+            type="text"
+            formControlName="species"
+            placeholder="Ejemplo: Perro"
+          >
+
+          @if (
+          petForm.controls.species.touched &&
+          petForm.controls.species.invalid
+          ) {
+          <small>La especie es obligatoria.</small>
+          }
+        </div>
+
+        <div class="field">
+          <label for="breed">Raza</label>
+
+          <input
+            id="breed"
+            type="text"
+            formControlName="breed"
+            placeholder="Ejemplo: Labrador"
+          >
+
+          @if (
+          petForm.controls.breed.touched &&
+          petForm.controls.breed.invalid
+          ) {
+          <small>La raza es obligatoria.</small>
+          }
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label for="birthDate">Fecha de nacimiento</label>
+
+          <input
+            id="birthDate"
+            type="date"
+            formControlName="birthDate"
+          >
+
+          @if (
+          petForm.controls.birthDate.touched &&
+          petForm.controls.birthDate.invalid
+          ) {
+          <small>La fecha de nacimiento es obligatoria.</small>
+          }
+        </div>
+
+        <div class="field">
+          <label for="ownerId">Propietario</label>
+
+          <select
+            id="ownerId"
+            formControlName="ownerId"
+          >
+            <option [value]="0">
+              Selecciona un propietario
+            </option>
+
+            @for (owner of owners(); track owner.id) {
+            <option [value]="owner.id">
+              {{ owner.name }}
+            </option>
+            }
+          </select>
+
+          @if (loadingOwners()) {
+          <small class="info">
+            Cargando propietarios...
+          </small>
+          }
+
+          @if (
+          petForm.controls.ownerId.touched &&
+          petForm.controls.ownerId.invalid
+          ) {
+          <small>Selecciona un propietario.</small>
+          }
+        </div>
+      </div>
+
+      <div class="actions">
+        <button
+          type="button"
+          class="secondary"
+          (click)="cancel()"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="submit"
+          [disabled]="loading() || loadingOwners()"
+        >
+          @if (loading()) {
+          Guardando...
+          } @else {
+          Guardar mascota
+          }
+        </button>
+      </div>
+    </form>
+  </section>
+</div>

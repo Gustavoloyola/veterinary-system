@@ -1,0 +1,141 @@
+<div class="page">
+  <header class="page-header">
+    <div>
+      <span class="eyebrow">Veterinaria</span>
+      <h1>Mascotas</h1>
+      <p>Consulta y administración de mascotas registradas.</p>
+    </div>
+
+    <div class="header-actions">
+      <button
+        type="button"
+        class="secondary"
+        (click)="backToDashboard()"
+      >
+        Volver
+      </button>
+
+      <button type="button" (click)="newPet()">
+        Nueva mascota
+      </button>
+    </div>
+  </header>
+
+  <section class="filter-card">
+    <div class="filter-field">
+      <label for="species">Especie</label>
+
+      <input
+        id="species"
+        type="text"
+        [(ngModel)]="speciesFilter"
+        placeholder="Ejemplo: Perro"
+      >
+    </div>
+
+    <div class="filter-field">
+      <label for="owner">Propietario</label>
+
+      <select
+        id="owner"
+        [(ngModel)]="ownerFilter"
+      >
+        <option [ngValue]="null">
+          Todos
+        </option>
+
+        @for (owner of owners(); track owner.id) {
+        <option [ngValue]="owner.id">
+          {{ owner.name }}
+        </option>
+        }
+      </select>
+    </div>
+
+    <div class="filter-actions">
+      <button type="button" (click)="applyFilters()">
+        Buscar
+      </button>
+
+      <button
+        type="button"
+        class="secondary"
+        (click)="clearFilters()"
+      >
+        Limpiar
+      </button>
+    </div>
+  </section>
+
+  @if (successMessage()) {
+  <div class="message success">
+    {{ successMessage() }}
+  </div>
+  }
+
+  @if (loading()) {
+  <div class="message">
+    Cargando mascotas...
+  </div>
+  } @else if (errorMessage()) {
+  <div class="message error">
+    {{ errorMessage() }}
+  </div>
+  } @else if (pets().length === 0) {
+  <div class="message">
+    No hay mascotas registradas.
+  </div>
+  } @else {
+  <section class="table-card">
+    <table>
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Especie</th>
+        <th>Raza</th>
+        <th>Nacimiento</th>
+        <th>Propietario</th>
+        <th>Acciones</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      @for (pet of pets(); track pet.id) {
+      <tr>
+        <td>{{ pet.id }}</td>
+        <td>{{ pet.name }}</td>
+        <td>{{ pet.species }}</td>
+        <td>{{ pet.breed }}</td>
+        <td>{{ pet.birthDate }}</td>
+        <td>{{ ownerName(pet.ownerId) }}</td>
+
+        <td class="row-actions">
+          <button
+            type="button"
+            class="edit-button"
+            (click)="editPet(pet.id)"
+          >
+            Editar
+          </button>
+
+          <button
+            type="button"
+            class="delete-button"
+            [disabled]="deletingId() === pet.id"
+            (click)="deletePet(pet)"
+          >
+            @if (deletingId() === pet.id) {
+            Eliminando...
+            } @else {
+            Eliminar
+            }
+          </button>
+        </td>
+      </tr>
+      }
+      </tbody>
+    </table>
+  </section>
+  }
+</div>

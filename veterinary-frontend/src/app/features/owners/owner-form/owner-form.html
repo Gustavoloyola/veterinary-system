@@ -1,0 +1,115 @@
+<div class="page">
+  <section class="form-card">
+    <div class="header">
+      <div>
+        <span class="eyebrow">Veterinaria</span>
+
+        <h1>
+          @if (editMode()) {
+          Editar propietario
+          } @else {
+          Nuevo propietario
+          }
+        </h1>
+
+        <p>
+          Captura la información del propietario.
+        </p>
+      </div>
+    </div>
+
+    @if (errorMessage()) {
+    <div class="error-message">
+      {{ errorMessage() }}
+    </div>
+    }
+
+    <form [formGroup]="ownerForm" (ngSubmit)="submit()">
+      <div class="field">
+        <label for="name">Nombre</label>
+
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          placeholder="Nombre completo"
+        >
+
+        @if (
+        ownerForm.controls.name.touched &&
+        ownerForm.controls.name.invalid
+        ) {
+        <small>El nombre es obligatorio.</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="phone">Teléfono</label>
+
+        <input
+          id="phone"
+          type="text"
+          formControlName="phone"
+          placeholder="5512345678"
+        >
+
+        @if (
+        ownerForm.controls.phone.touched &&
+        ownerForm.controls.phone.invalid
+        ) {
+        <small>El teléfono es obligatorio.</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="email">Correo</label>
+
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="correo@ejemplo.com"
+        >
+
+        @if (
+        ownerForm.controls.email.touched &&
+        ownerForm.controls.email.invalid
+        ) {
+        <small>Ingresa un correo válido.</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="address">Dirección</label>
+
+        <textarea
+          id="address"
+          rows="3"
+          formControlName="address"
+          placeholder="Dirección del propietario"
+        ></textarea>
+      </div>
+
+      <div class="actions">
+        <button
+          type="button"
+          class="secondary"
+          (click)="cancel()"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="submit"
+          [disabled]="loading()"
+        >
+          @if (loading()) {
+          Guardando...
+          } @else {
+          Guardar propietario
+          }
+        </button>
+      </div>
+    </form>
+  </section>
+</div>

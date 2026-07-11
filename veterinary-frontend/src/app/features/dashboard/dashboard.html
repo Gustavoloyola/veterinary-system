@@ -1,0 +1,26 @@
+<div class="dashboard-page">
+  <section class="dashboard-card">
+    <div class="icon">🐾</div>
+
+    <h1>Dashboard veterinario</h1>
+
+    <p>
+      El inicio de sesión fue correcto y el token quedó almacenado.
+    </p>
+
+    <div class="actions">
+      <button type="button" routerLink="/owners">
+        Propietarios
+      </button>
+
+      <button type="button" routerLink="/pets">
+        Mascotas
+      </button>
+
+      <button type="button" (click)="logout()">
+        Cerrar sesión
+      </button>
+
+    </div>
+  </section>
+</div>

@@ -1,0 +1,88 @@
+services:
+  mysql:
+    image: container-registry.oracle.com/mysql/community-server:8.4
+    container_name: veterinary-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_HOST: "%"
+    ports:
+      - "3307:3306"
+    volumes:
+      - veterinary-mysql-data:/var/lib/mysql
+    networks:
+      - veterinary-network
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h localhost -uroot -proot --silent"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  auth-service:
+    image: veterinary-auth-service:latest
+    container_name: veterinary-auth-container
+    environment:
+      AUTH_USERNAME: admin
+      AUTH_PASSWORD: admin123
+      JWT_SECRET: "01234567890123456789012345678901"
+    ports:
+      - "8081:8081"
+    networks:
+      - veterinary-network
+
+  owner-service:
+    image: veterinary-owner-service:latest
+    container_name: veterinary-owner-container
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/veterinary_owners?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC"
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      JWT_SECRET: "01234567890123456789012345678901"
+    ports:
+      - "8082:8082"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - veterinary-network
+
+  pet-service:
+    image: veterinary-pet-service:latest
+    container_name: veterinary-pet-container
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/veterinary_pets?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC"
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      JWT_SECRET: "01234567890123456789012345678901"
+      OWNER_SERVICE_URL: "http://owner-service:8082"
+    ports:
+      - "8083:8083"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      owner-service:
+        condition: service_started
+    networks:
+      - veterinary-network
+
+  frontend:
+    image: veterinary-frontend:latest
+    container_name: veterinary-frontend-container
+    ports:
+      - "4200:4200"
+    depends_on:
+      - auth-service
+      - owner-service
+      - pet-service
+    networks:
+      - veterinary-network
+
+networks:
+  veterinary-network:
+    name: veterinary-network
+
+volumes:
+  veterinary-mysql-data:
