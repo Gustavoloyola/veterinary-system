@@ -24,7 +24,7 @@ export interface PetRequest {
 })
 export class PetService {
 
-  private readonly apiUrl = 'http://localhost:8083/api/pets';
+  private readonly apiUrl = 'https://ve-158dd3ec9d0b49bd8d3b08b5a109f490.ecs.us-east-2.on.aws/api/pets';
 
   constructor(private readonly http: HttpClient) {
   }

@@ -18,7 +18,7 @@ export interface LoginResponse {
 })
 export class AuthService {
 
-  private readonly apiUrl = 'http://localhost:8081/api/auth';
+  private readonly apiUrl = 'https://ve-5be809003dfc466eb0754e0ce30fac58.ecs.us-east-2.on.aws/api/auth';
   private readonly tokenKey = 'veterinary_token';
 
   constructor(private readonly http: HttpClient) {

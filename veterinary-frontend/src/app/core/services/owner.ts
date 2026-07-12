@@ -22,7 +22,7 @@ export interface OwnerRequest {
 })
 export class OwnerService {
 
-  private readonly apiUrl = 'http://localhost:8082/api/owners';
+  private readonly apiUrl = 'https://ve-0e2bd784d9fe4afb9a3d91f44adba958.ecs.us-east-2.on.aws/api/owners';
 
   constructor(private readonly http: HttpClient) {
   }
