@@ -82,8 +82,11 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(
-                List.of("http://localhost:4200")
-        );
+        List.of(
+                "http://localhost:4200",
+                "https://ve-6bc940d7d5c645d18b373f86d595a16a.ecs.us-east-2.on.aws"
+        )
+);
 
         configuration.setAllowedMethods(
                 List.of(
