@@ -12,7 +12,7 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
   'https://ve-0e2bd784d9fe4afb9a3d91f44adba958.ecs.us-east-2.on.aws'
 ) ||
 request.url.startsWith(
-  'https://ve-158dd3ec9d0b49bd8d3b08b5a109f490.ecs.us-east-2.on.aws'
+  'https://ve-158dd3ec9d0b49db8d3b08b5a109f490.ecs.us-east-2.on.aws'
 )
 
   if (!token || !isBackendRequest) {
